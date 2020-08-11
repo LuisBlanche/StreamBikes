@@ -1,7 +1,33 @@
 streambikes
 ==============================
 
-Testing real time bike APIs, streamlit and online learning 
+Testing real time bike APIs, streamlit and online learning
+
+To run project:
+
+```bash
+make create_environments
+```
+
+Activate the environment
+
+Install packages
+
+```bash
+make requirements
+```
+
+If you are developing :
+
+```bash
+make requirements-dev
+```
+
+To run the streamlit app =
+
+```bash
+streamlit run src/visualization/visualize.py
+```
 
 Project Organization
 ------------
