@@ -10,6 +10,8 @@ logging.basicConfig(level=logging.INFO, format=log_fmt)
 # not used in this stub but often useful for finding various files
 PROJECT_PATH = Path(__file__).resolve().parents[2]
 DATA_PATH = PROJECT_PATH / "data"
+
+STATIONS_API_URL = "https://api.jcdecaux.com/vls/v1/stations/"
 # find .env automagically by walking up directories until it's found, then
 # load up the .env entries as environment variables
 load_dotenv(find_dotenv())
