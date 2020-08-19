@@ -2,20 +2,8 @@ import os
 import logging
 import requests
 from flatten_json import flatten
-
 import pandas as pd
 from src import settings
-from manydataapi.velib import DataCollectJCDecaux
-
-
-def get_data(contract):
-    bikes_api = DataCollectJCDecaux(
-        os.environ['API_KEY'], fetch_contracts=True)
-    js = bikes_api.get_json(contract)
-    df = pd.DataFrame().from_records(js)
-    df["last_update"] = pd.to_datetime(df['last_update'])
-    df.rename(columns={'lng': 'lon'}, inplace=True)
-    return df
 
 
 def get_station_data(contract, station_number):
