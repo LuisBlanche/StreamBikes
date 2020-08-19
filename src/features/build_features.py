@@ -13,14 +13,16 @@ def build_train_predict_features(contract, station_number, target):
 def prepare_train(data, target):
     y = data[target]
     data.pop(target)
-    data['date'] = get_date(data['last_update'])
+    data['date'] = datetime.datetime.now()
+    data['update_date'] = get_date(data['last_update'])
     data['ordinal_date'], data['sin_hour'], data['cos_hour'] = build_time_features(
         data['date'])
     return data, y
 
 
 def prepare_pred(data_pred):
-    data_pred['date'] = get_date(
+    data_pred['date'] = datetime.datetime.now()
+    data_pred['update_date'] = get_date(
         data_pred['last_update']) + datetime.timedelta(hours=1)
     data_pred['ordinal_date'], data_pred['sin_hour'], data_pred['cos_hour'] = build_time_features(
         data_pred['date'])
