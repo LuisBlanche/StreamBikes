@@ -12,3 +12,4 @@ fire
 creme
 json-flatten
 graphviz
+redis
