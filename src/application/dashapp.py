@@ -6,9 +6,13 @@ import datetime
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
+import dash_table
 
 from src.models.online_model import train_pred_step, define_pipeline
 from src.features.build_features import build_train_predict_features
+
+contract = 'lyon'
+station = '2010'
 
 
 def get_data(contract, station, list_cat_features, list_num_features, target, learning_rate=0.1):
@@ -22,7 +26,9 @@ def get_data(contract, station, list_cat_features, list_num_features, target, le
     data["available_bikes"] = int(y)
     data["available_bikes_1min"] = float(y_pred_one)
     data["available_bikes_1h"] = float(y_pred_1h)
+    print(dict(model.regressor["LinearRegression"].weights))
     push_to_redis(data)
+    return dict(model.regressor["LinearRegression"].weights)
 
 
 def push_to_redis(data):
@@ -63,6 +69,8 @@ app.layout = html.Div([html.H2("Bike Stream"),
                            plot_bgcolor=app_color["graph_bg"],
                            paper_bgcolor=app_color["graph_bg"]),
                        )),
+                       dash_table.DataTable(id='table'),
+
                        dcc.Interval(
     id="update",
     interval=60000,
@@ -70,16 +78,18 @@ app.layout = html.Div([html.H2("Bike Stream"),
 ), ])
 
 
-@ app.callback(
-    Output("bikes-forecast", "figure"), [Input("update", "n_intervals")]
+@app.callback(
+    [Output("bikes-forecast", "figure"), Output("table", "data"), Output("table", "columns")
+     ], [Input("update", "n_intervals")]
 )
 def gen_forecast_graph(data):
     """
 
     :params interval: update the graph based on an interval
     """
-    get_data('lyon', 2002, ['main_weather_0_main', 'bonus'],
-             ['temp', 'wind_speed', 'clouds', 'sin_hour', 'cos_hour'], 'available_bikes')
+    weights = get_data(contract, station, [],
+                       ['temp', 'wind_speed', 'clouds', 'sin_hour', 'cos_hour'], 'available_bikes')
+    columns = [{"name": i, "id": i} for i in weights.keys()]
     data = get_df_from_redis(
         ['date', 'available_bikes', 'available_bikes_1min', 'available_bikes_1h'])
     data = data.drop_duplicates(subset=['date'])
@@ -106,7 +116,7 @@ def gen_forecast_graph(data):
         height=700,
     )
 
-    return dict(data=trace, layout=layout)
+    return dict(data=trace, layout=layout), [weights], columns
 
 
 if __name__ == '__main__':
