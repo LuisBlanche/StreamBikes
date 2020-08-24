@@ -21,6 +21,10 @@ def get_data(contract, station, list_cat_features, list_num_features, target, le
         list_cat_features, list_num_features, learning_rate=learning_rate)
     y_pred_one, y_pred_1h, metric, model = train_pred_step(
         X, y, X_pred, model, metric)
+    print("X:", [(k, X[k])
+                 for k in ['temp', 'wind_speed', 'clouds', 'sin_hour', 'cos_hour']])
+    print("Pred", [(k, X_pred[k])
+                   for k in ['temp', 'wind_speed', 'clouds', 'sin_hour', 'cos_hour']])
     data = {}
     data["date"] = str(X['date'])
     data["available_bikes"] = int(y)
@@ -78,7 +82,7 @@ app.layout = html.Div([html.H2("Bike Stream"),
 ), ])
 
 
-@app.callback(
+@ app.callback(
     [Output("bikes-forecast", "figure"), Output("table", "data"), Output("table", "columns")
      ], [Input("update", "n_intervals")]
 )
