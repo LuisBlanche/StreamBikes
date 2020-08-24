@@ -21,9 +21,9 @@ def prepare_train(data, target):
 
 
 def prepare_pred(data_pred):
-    data_pred['date'] = datetime.datetime.now()
+    data_pred['date'] = datetime.datetime.now() + datetime.timedelta(hours=1)
     data_pred['update_date'] = get_date(
-        data_pred['last_update']) + datetime.timedelta(hours=1)
+        data_pred['last_update'])
     data_pred['ordinal_date'], data_pred['sin_hour'], data_pred['cos_hour'] = build_time_features(
         data_pred['date'])
     return data_pred
@@ -45,6 +45,6 @@ def build_time_features(date):
 
 
 def build_cyclical_hour(dt):
-    sin_hour = math.sin(2 * math.pi * dt.hour / 24)
-    cos_hour = math.cos(2 * math.pi * dt.hour / 24)
+    sin_hour = math.sin(2 * math.pi * (dt.hour + (dt.minute / 60)) / 24)
+    cos_hour = math.cos(2 * math.pi * (dt.hour + (dt.minute / 60)) / 24)
     return sin_hour, cos_hour
