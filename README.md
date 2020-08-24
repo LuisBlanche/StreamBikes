@@ -1,7 +1,7 @@
 streambikes
 ==============================
 
-Testing real time bike APIs, streamlit and online learning
+Testing real time bike APIs and online learning with Plotly Dash 
 
 To run project:
 
@@ -23,10 +23,10 @@ If you are developing :
 make requirements-dev
 ```
 
-To run the streamlit app =
+To run the dash app =
 
 ```bash
-streamlit run src/visualization/visualize.py
+dash run src/application/dashapp.py
 ```
 
 Project Organization
@@ -62,18 +62,16 @@ Project Organization
     │   ├── __init__.py    <- Makes src a Python module
     │   │
     │   ├── data           <- Scripts to download or generate data
-    │   │   └── make_dataset.py
+    │   │   └── collect_bike_data.py
     │   │
     │   ├── features       <- Scripts to turn raw data into features for modeling
     │   │   └── build_features.py
     │   │
-    │   ├── models         <- Scripts to train models and then use trained models to make
-    │   │   │                 predictions
-    │   │   ├── predict_model.py
-    │   │   └── train_model.py
+    │   ├── models         <- Scripts for online learning (train and predict at the same time) 
+    │   │   └── online_model.py
     │   │
-    │   └── visualization  <- Scripts to create exploratory and results oriented visualizations
-    │       └── visualize.py
+    │   └── application  <- Scripts to create a small dashapp tp present results
+    │       └── dashapp.py
     │
     └── tox.ini            <- tox file with settings for running tox; see tox.readthedocs.io
 
