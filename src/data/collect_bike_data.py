@@ -7,16 +7,54 @@ from src import settings
 
 
 def get_station_data(contract, station_number):
+    """Retrieves last available station data
+
+    Parameters
+    ----------
+    contract : str
+        city where the station is
+    station_number : int
+        station identifier
+
+    Returns
+    -------
+    json
+        json containing the station level data
+    """
     url = f"{settings.STATIONS_API_URL}{station_number}?contract={contract}&apiKey={os.environ['API_KEY']}"
     response = requests.get(url)
     logging.debug(f'Response for url = {url} : {response}')
-    return response.json()
+    if response.status_code == 404:
+        raise ValueError(
+            f'Station: {station_number} or contrac: {contract} does not exist')
+    elif response.status_code == 403:
+        raise ConnectionRefusedError("Problem with API key")
+    else:
+        return response.json()
 
 
 def get_latlon_weather(lat, lon):
+    """Returns current OpenWeather API weather and hourly predictions for a given postition
+
+    Parameters
+    ----------
+    lat : float
+        latitude
+    lon : float
+        longitude
+
+    Returns
+    -------
+    json
+        current weather and hourly predictions
+    """
     url = f"https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&exclude=minutely,daily&appid={os.environ['OPENWEATHER_API_KEY']}"
     response = requests.get(url)
-    return response.json()
+    if response.status_code == 400:
+        raise ValueError(
+            f"Latitude = {lat}, Longitude = {lon} is an invalid position")
+    else:
+        return response
 
 
 def get_bike_weather_data(contract, station_number):

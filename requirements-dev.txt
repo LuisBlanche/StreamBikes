@@ -4,3 +4,4 @@ autopep8
 
 Sphinx
 coverage
+pytests
