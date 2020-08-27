@@ -28,7 +28,7 @@ def get_station_data(contract, station_number):
         raise ValueError(
             f'Station: {station_number} or contrac: {contract} does not exist')
     elif response.status_code == 403:
-        raise ConnectionRefusedError("Problem with API key")
+        raise ConnectionRefusedError("Problem with Bikes API key")
     else:
         return response.json()
 
@@ -53,8 +53,10 @@ def get_latlon_weather(lat, lon):
     if response.status_code == 400:
         raise ValueError(
             f"Latitude = {lat}, Longitude = {lon} is an invalid position")
+    elif response.status_code == 401:
+        raise ConnectionRefusedError("Problem with Weather API key")
     else:
-        return response
+        return response.json()
 
 
 def get_bike_weather_data(contract, station_number):
@@ -67,7 +69,7 @@ def get_bike_weather_data(contract, station_number):
     bike_data['main_weather'] = weather["current"]['weather']
     bike_data_pred = bike_data.copy()
     bike_data_pred['temp'] = weather["hourly"][0]['feels_like']
-    bike_data_pred['wind'] = weather["hourly"][0]['wind_speed']
+    bike_data_pred['wind_speed'] = weather["hourly"][0]['wind_speed']
     bike_data_pred['clouds'] = weather["hourly"][0]['clouds']
     bike_data_pred['main_weather'] = weather["hourly"][0]['weather']
     bike_data = flatten(bike_data)
