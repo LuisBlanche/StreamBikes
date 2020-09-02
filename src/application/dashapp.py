@@ -1,8 +1,10 @@
 import dash
 import os
+import logging
 import pandas as pd
 import redis
 import datetime
+from sklearn.metrics import mean_absolute_error
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
@@ -13,6 +15,8 @@ from src.features.build_features import build_train_predict_features
 
 contract = 'lyon'
 station = '2010'
+features = ['logtemp', 'logwind', 'clouds', 'sin_hour',
+            'cos_hour', 'logtempXsinhour', 'logtempXcoshour', 'weekday']
 
 
 def get_data(contract, station, list_cat_features, list_num_features, target, learning_rate=0.1):
@@ -21,16 +25,16 @@ def get_data(contract, station, list_cat_features, list_num_features, target, le
         list_cat_features, list_num_features, learning_rate=learning_rate)
     y_pred_one, y_pred_1h, metric, model = train_pred_step(
         X, y, X_pred, model, metric)
-    print("X:", [(k, X[k])
-                 for k in ['temp', 'wind_speed', 'clouds', 'sin_hour', 'cos_hour']])
-    print("Pred", [(k, X_pred[k])
-                   for k in ['temp', 'wind_speed', 'clouds', 'sin_hour', 'cos_hour']])
+    logging.info("X:", [(k, X[k])
+                        for k in features])
+    logging.info("Pred", [(k, X_pred[k])
+                          for k in features])
     data = {}
     data["date"] = str(X['date'])
     data["available_bikes"] = int(y)
     data["available_bikes_1min"] = float(y_pred_one)
     data["available_bikes_1h"] = float(y_pred_1h)
-    print(dict(model.regressor["LinearRegression"].weights))
+    logging.info(dict(model.regressor["LinearRegression"].weights))
     push_to_redis(data)
     return dict(model.regressor["LinearRegression"].weights)
 
@@ -53,6 +57,18 @@ def get_df_from_redis(keys):
     return df
 
 
+def get_prediction_error(data):
+    if len(data) > 60:
+        data = data.set_index('date')
+        data['available_bikes_1h'] = data['available_bikes_1h'].shift(60)
+        data_last_hour = data.iloc[-60:]
+        mae = mean_absolute_error(
+            data_last_hour['available_bikes'], data_last_hour['available_bikes_1h'])
+    else:
+        mae = 'Wait for one hour to get MAE'
+    return mae
+
+
 GRAPH_INTERVAL = os.environ.get("GRAPH_INTERVAL", 6000)
 
 app = dash.Dash(
@@ -69,6 +85,7 @@ server = app.server
 app_color = {"graph_bg": "#082255", "graph_line": "#007ACE"}
 
 app.layout = html.Div([html.H2("Bike Stream"),
+                       html.H3(id='score'),
                        dcc.Graph(id='bikes-forecast', figure=dict(layout=dict(
                            plot_bgcolor=app_color["graph_bg"],
                            paper_bgcolor=app_color["graph_bg"]),
@@ -83,7 +100,7 @@ app.layout = html.Div([html.H2("Bike Stream"),
 
 
 @ app.callback(
-    [Output("bikes-forecast", "figure"), Output("table", "data"), Output("table", "columns")
+    [Output("bikes-forecast", "figure"), Output("table", "data"), Output("table", "columns"), Output("score", "children")
      ], [Input("update", "n_intervals")]
 )
 def gen_forecast_graph(data):
@@ -92,12 +109,12 @@ def gen_forecast_graph(data):
     :params interval: update the graph based on an interval
     """
     weights = get_data(contract, station, [],
-                       ['temp', 'wind_speed', 'clouds', 'sin_hour', 'cos_hour'], 'available_bikes')
+                       features, 'available_bikes')
     columns = [{"name": i, "id": i} for i in weights.keys()]
     data = get_df_from_redis(
         ['date', 'available_bikes', 'available_bikes_1min', 'available_bikes_1h'])
     data = data.drop_duplicates(subset=['date'])
-    print(data)
+    mae = get_prediction_error(data)
     trace = [dict(
         type="scatter",
         x=data['date'],
@@ -120,7 +137,7 @@ def gen_forecast_graph(data):
         height=700,
     )
 
-    return dict(data=trace, layout=layout), [weights], columns
+    return dict(data=trace, layout=layout), [weights], columns, f"MAE score over last hour = {mae}"
 
 
 if __name__ == '__main__':
