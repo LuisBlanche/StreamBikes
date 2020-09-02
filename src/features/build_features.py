@@ -17,6 +17,11 @@ def prepare_train(data, target):
     data['update_date'] = get_date(data['last_update'])
     data['ordinal_date'], data['sin_hour'], data['cos_hour'] = build_time_features(
         data['date'])
+    data['logtemp'] = math.log(data['temp'] + 10)
+    data['logwind'] = math.log(data['wind_speed'] + 10)
+    data['logtempXsinhour'] = data['logtemp'] * data['sin_hour']
+    data['logtempXcoshour'] = data['logtemp'] * data['cos_hour']
+    data['weekday'] = weekday(data['date'])
     return data, y
 
 
@@ -26,6 +31,11 @@ def prepare_pred(data_pred):
         data_pred['last_update'])
     data_pred['ordinal_date'], data_pred['sin_hour'], data_pred['cos_hour'] = build_time_features(
         data_pred['date'])
+    data_pred['logtemp'] = math.log(data_pred['temp'] + 10)
+    data_pred['logwind'] = math.log(data_pred['wind_speed'] + 10)
+    data_pred['logtempXsinhour'] = data_pred['logtemp'] * data_pred['sin_hour']
+    data_pred['logtempXcoshour'] = data_pred['logtemp'] * data_pred['cos_hour']
+    data_pred['weekday'] = weekday(data_pred['date'])
     return data_pred
 
 
@@ -48,3 +58,10 @@ def build_cyclical_hour(dt):
     sin_hour = math.sin(2 * math.pi * (dt.hour + (dt.minute / 60)) / 24)
     cos_hour = math.cos(2 * math.pi * (dt.hour + (dt.minute / 60)) / 24)
     return sin_hour, cos_hour
+
+
+def weekday(dt):
+    if dt.weekday() in (5, 6):
+        return 0
+    else:
+        return 1

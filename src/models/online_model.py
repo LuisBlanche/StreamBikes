@@ -1,8 +1,14 @@
 import logging
 import time
 import datetime
-from creme import compose, linear_model, metrics, preprocessing, optim, time_series
+import numbers
+from creme import compose, linear_model, metrics, preprocessing, optim, time_series, feature_extraction, stats
 from src.features.build_features import build_train_predict_features
+
+
+def get_hour(x):
+    x['hour'] = x['date'].hour
+    return x
 
 
 def define_pipeline(list_cat_features, list_num_features, learning_rate):
@@ -16,12 +22,15 @@ def define_pipeline(list_cat_features, list_num_features, learning_rate):
         a metric to monitor during online learning
     """
     init = optim.initializers.Normal(mu=0, sigma=1, seed=42)
-    categ_processing = compose.Select(
+    num = compose.Select(*list_num_features) | preprocessing.StandardScaler()
+    cat = compose.SelectType(
         *list_cat_features) | preprocessing.OneHotEncoder()
-    num_processing = compose.Select(
-        *list_num_features) | preprocessing.StandardScaler()
+    mean_target = get_hour | feature_extraction.TargetAgg(
+        by=['hour'], how=stats.BayesianMean(
+            prior=3,
+            prior_weight=1)) | preprocessing.StandardScaler()
     model = compose.Pipeline(
-        categ_processing + num_processing,
+        num + cat + mean_target,
         linear_model.LinearRegression(
             optimizer=optim.SGD(learning_rate), intercept_lr=0.001, initializer=init)
     )
