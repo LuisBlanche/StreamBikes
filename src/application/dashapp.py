@@ -25,10 +25,8 @@ def get_data(contract, station, list_cat_features, list_num_features, target, le
         list_cat_features, list_num_features, learning_rate=learning_rate)
     y_pred_one, y_pred_1h, metric, model = train_pred_step(
         X, y, X_pred, model, metric)
-    logging.info("X:", [(k, X[k])
-                        for k in features])
-    logging.info("Pred", [(k, X_pred[k])
-                          for k in features])
+    logging.info(f"X:{[(k, X[k]) for k in features]}")
+    logging.info(f"Pred: {[(k, X_pred[k]) for k in features]}")
     data = {}
     data["date"] = str(X['date'])
     data["available_bikes"] = int(y)
@@ -40,13 +38,13 @@ def get_data(contract, station, list_cat_features, list_num_features, target, le
 
 
 def push_to_redis(data):
-    r = redis.Redis(host="localhost")
+    r = redis.Redis(host="redis_service")
     for k, v in data.items():
         r.rpush(k, v)
 
 
 def get_df_from_redis(keys):
-    r = redis.Redis(host="localhost")
+    r = redis.Redis(host="redis_service")
     df = pd.DataFrame()
     for k in keys:
         df[k] = r.lrange(k, 0, -1)

@@ -1,0 +1,18 @@
+version: "3.1"
+services:
+  redis_service:
+    image: redis
+  dash:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - "8050:8050"
+    environment:
+      API_SECRETS_FILE: /run/secrets/secrets
+    depends_on:
+      - redis_service
+    restart: always
+secrets:
+  api_keys:
+    file: secrets.json
