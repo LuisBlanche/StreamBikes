@@ -58,13 +58,13 @@ def subs_get_station_data(*args, **kwargs):
 
 @pytest.fixture()
 def mock_get_station_data(monkeypatch):
-    from src.data import collect_bike_data
-    monkeypatch.setattr(collect_bike_data,
+    from src.data import collect_data
+    monkeypatch.setattr(collect_data,
                         'get_station_data', subs_get_station_data)
 
 
 @pytest.fixture()
 def mock_get_latlon_weather(monkeypatch):
-    from src.data import collect_bike_data
-    monkeypatch.setattr(collect_bike_data,
+    from src.data import collect_data
+    monkeypatch.setattr(collect_data,
                         'get_latlon_weather', subs_get_latlon_weather)

@@ -1,5 +1,5 @@
 import pytest
-from src.data.collect_bike_data import get_station_data, get_latlon_weather, get_bike_weather_data
+from src.data.collect_data import get_station_data, get_latlon_weather, get_bike_weather_data
 
 
 @pytest.mark.parametrize("contract,station_number", [("lyon", 2010), ("marseille", 1130)])

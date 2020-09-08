@@ -1,6 +1,6 @@
 import math
 import datetime
-from src.data.collect_bike_data import get_bike_weather_data
+from src.data.collect_data import get_bike_weather_data
 
 
 def build_train_predict_features(contract, station_number, target):
