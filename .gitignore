@@ -89,3 +89,4 @@ target/
 .mypy_cache/
 
 secrets*
+api_keys.yml
