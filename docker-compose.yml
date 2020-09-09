@@ -9,10 +9,12 @@ services:
     ports:
       - "8050:8050"
     environment:
-      API_SECRETS_FILE: /run/secrets/secrets
+      API_SECRETS_FILE: /run/secrets/api_keys
     depends_on:
       - redis_service
     restart: always
+    secrets:
+      - api_keys
 secrets:
   api_keys:
-    file: secrets.json
+    file: src/settings/api_keys.yml

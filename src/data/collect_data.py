@@ -21,7 +21,7 @@ def get_station_data(contract, station_number):
     json
         json containing the station level data
     """
-    url = f"{settings.STATIONS_API_URL}{station_number}?contract={contract}&apiKey={os.environ['API_KEY']}"
+    url = f"{settings.STATIONS_API_URL}{station_number}?contract={contract}&apiKey={settings.API_KEYS['DECAUX_API']}"
     response = requests.get(url)
     logging.debug(f'Response for url = {url} : {response}')
     if response.status_code == 404:
@@ -48,7 +48,8 @@ def get_latlon_weather(lat, lon):
     json
         current weather and hourly predictions
     """
-    url = f"https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&exclude=minutely,daily&appid={os.environ['OPENWEATHER_API_KEY']}"
+
+    url = f"https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&exclude=minutely,daily&appid={settings.API_KEYS['WEATHER_API']}"
     response = requests.get(url)
     if response.status_code == 400:
         raise ValueError(
