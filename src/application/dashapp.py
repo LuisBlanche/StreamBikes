@@ -9,7 +9,8 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 import dash_table
-
+from dash_table.Format import Format, Scheme
+from src import settings
 from src.models.online_model import train_pred_step, define_pipeline
 from src.features.build_features import build_train_predict_features
 
@@ -25,8 +26,8 @@ def get_data(contract, station, list_cat_features, list_num_features, target, le
         list_cat_features, list_num_features, learning_rate=learning_rate)
     y_pred_one, y_pred_1h, metric, model = train_pred_step(
         X, y, X_pred, model, metric)
-    logging.info(f"X:{[(k, X[k]) for k in features]}")
-    logging.info(f"Pred: {[(k, X_pred[k]) for k in features]}")
+    logging.debug(f"X:{[(k, X[k]) for k in features]}")
+    logging.debug(f"Pred: {[(k, X_pred[k]) for k in features]}")
     data = {}
     data["date"] = str(X['date'])
     data["available_bikes"] = int(y)
@@ -38,13 +39,13 @@ def get_data(contract, station, list_cat_features, list_num_features, target, le
 
 
 def push_to_redis(data):
-    r = redis.Redis(host="redis_service")
+    r = redis.Redis(host=settings.REDIS)
     for k, v in data.items():
         r.rpush(k, v)
 
 
 def get_df_from_redis(keys):
-    r = redis.Redis(host="redis_service")
+    r = redis.Redis(host=settings.REDIS)
     df = pd.DataFrame()
     for k in keys:
         df[k] = r.lrange(k, 0, -1)
@@ -88,7 +89,8 @@ app.layout = html.Div([html.H2("Bike Stream"),
                            plot_bgcolor=app_color["graph_bg"],
                            paper_bgcolor=app_color["graph_bg"]),
                        )),
-                       dash_table.DataTable(id='table'),
+                       html.Div(dash_table.DataTable(id='table'), style={
+                                'width': '60%', 'display': 'inline-block', 'vertical-align': 'middle', 'horizontal-align': "middle"}),
 
                        dcc.Interval(
     id="update",
@@ -108,7 +110,8 @@ def gen_forecast_graph(data):
     """
     weights = get_data(contract, station, [],
                        features, 'available_bikes')
-    columns = [{"name": i, "id": i} for i in weights.keys()]
+    columns = [{"name": i, "id": i, 'type': 'numeric', 'format': {'specifier': ".3"}}
+               for i in weights.keys()]
     data = get_df_from_redis(
         ['date', 'available_bikes', 'available_bikes_1min', 'available_bikes_1h'])
     data = data.drop_duplicates(subset=['date'])
