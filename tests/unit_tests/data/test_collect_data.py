@@ -19,7 +19,8 @@ def test_get_station_data_value_error(contract, station_number):
 
 @pytest.mark.parametrize("contract,station_number", [("lyon", 2010), ("marseille", 1130)])
 def test_get_station_data_apikey_error(monkeypatch, contract, station_number):
-    monkeypatch.setenv('API_KEY', "invalidapikey")
+    from src import settings
+    monkeypatch.setitem(settings.API_KEYS, 'DECAUX_API', "invalidapikey")
     with pytest.raises(ConnectionRefusedError) as cre:
         get_station_data(contract, station_number)
         assert cre == "Problem with Bikes API key"
@@ -42,7 +43,8 @@ def test_get_latlon_weather_value_error(lat, lon):
 
 @pytest.mark.parametrize("lat,lon", [(43, 20), (4, 53.6)])
 def test_get_latlon_weather_apikey_error(monkeypatch, lat, lon):
-    monkeypatch.setenv('OPENWEATHER_API_KEY', "invalidapikey")
+    from src import settings
+    monkeypatch.setitem(settings.API_KEYS, "WEATHER_API", "invalidapikey")
     with pytest.raises(ConnectionRefusedError) as cre:
         get_latlon_weather(lat, lon)
         assert cre == "Problem with Weather API key"
