@@ -12,14 +12,21 @@ PROJECT_PATH = Path(__file__).resolve().parents[2]
 
 dotenv_path = PROJECT_PATH / '.env'
 dotenv.load_dotenv(dotenv_path)
-
 ENVIRONMENT = os.environ.get('ENV')
 logging.info(f'Environment = {ENVIRONMENT}')
-if ENVIRONMENT == 'dev':
-    REDIS = 'localhost'
-else:
-    REDIS = 'redis_service'
 
+
+def get_redis_host(env):
+    if env == 'dev':
+        return 'localhost'
+    elif env == 'docker':
+        return 'redis_service'
+    else:
+        raise ValueError(
+            'ENV variable may either be "dev" or "docker" in .env')
+
+
+REDIS = get_redis_host(ENVIRONMENT)
 
 DATA_PATH = PROJECT_PATH / "data"
 
@@ -29,8 +36,12 @@ STATIONS_API_URL = "https://api.jcdecaux.com/vls/v1/stations/"
 def get_api_keys(secret_name, env):
     if env == 'docker':
         secret_path = f'/run/secrets/{secret_name}'
-    else:
+    elif env == 'dev':
         secret_path = PROJECT_PATH / 'src' / 'settings' / f'{secret_name}.yml'
+    else:
+        raise ValueError(
+            'ENV variable may either be "dev" or "docker" in .env')
+
     try:
         with open(secret_path, 'r') as secret_file:
             logging.info(f'Loading secrets from {secret_file.name}')
