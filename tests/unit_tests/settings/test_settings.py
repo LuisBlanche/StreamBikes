@@ -17,7 +17,7 @@ def test_get_redis_fail():
     with pytest.raises(ValueError) as ver:
         from src.settings import get_redis_host
         get_redis_host('wrong_env')
-    assert 'ENV variable may either be "dev" or "docker" in .env' in str(
+    assert 'ENV variable may either be "travis", "dev" or "docker" in .env' in str(
         ver.value)
 
 
@@ -31,7 +31,7 @@ def test_get_api_keys_fail_env():
     from src.settings import get_api_keys
     with pytest.raises(ValueError) as ver:
         get_api_keys("api_keys", "wrong_env")
-    assert 'ENV variable may either be "dev" or "docker" in .env' in str(
+    assert 'ENV variable may either be "travis", "dev" or "docker" in .env' in str(
         ver.value)
 
 

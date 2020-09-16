@@ -20,7 +20,7 @@ def get_redis_host(env):
         return 'redis_service'
     else:
         raise ValueError(
-            'ENV variable may either be "dev" or "docker" in .env')
+            'ENV variable may either be "travis", "dev" or "docker" in .env')
 
 
 REDIS = get_redis_host(ENVIRONMENT)
@@ -33,14 +33,14 @@ STATIONS_API_URL = "https://api.jcdecaux.com/vls/v1/stations/"
 def get_api_keys(secret_name, env):
     if env == 'travis':
         return {'DECAUX_API': os.environ.get('DECAUX_API'), 'WEATHER_API': os.environ.get('WEATHER_API')}
-    if env == 'docker':
+    elif env == 'docker':
         secret_path = f'/run/secrets/{secret_name}'
     elif env == 'dev':
         secret_path = PROJECT_PATH / 'src' / 'settings' / f'{secret_name}.yml'
 
     else:
         raise ValueError(
-            'ENV variable may either be "dev" or "docker" in .env')
+            'ENV variable may either be "travis", "dev" or "docker" in .env')
 
     try:
         with open(secret_path, 'r') as secret_file:
