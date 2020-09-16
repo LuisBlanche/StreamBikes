@@ -2,7 +2,6 @@ from pathlib import Path
 import logging
 import yaml
 import os
-import dotenv
 
 log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 logging.basicConfig(level=logging.INFO, format=log_fmt)
@@ -10,14 +9,12 @@ logging.basicConfig(level=logging.INFO, format=log_fmt)
 # not used in this stub but often useful for finding various files
 PROJECT_PATH = Path(__file__).resolve().parents[2]
 
-dotenv_path = PROJECT_PATH / '.env'
-dotenv.load_dotenv(dotenv_path)
-ENVIRONMENT = os.environ.get('ENV')
+ENVIRONMENT = os.environ.get('ENV') or 'dev'
 logging.info(f'Environment = {ENVIRONMENT}')
 
 
 def get_redis_host(env):
-    if env == 'dev':
+    if env == 'dev' or env == 'travis':
         return 'localhost'
     elif env == 'docker':
         return 'redis_service'
@@ -34,10 +31,13 @@ STATIONS_API_URL = "https://api.jcdecaux.com/vls/v1/stations/"
 
 
 def get_api_keys(secret_name, env):
+    if env == 'travis':
+        return {'DECAUX_API': os.environ.get('DECAUX_API'), 'WEATHER_API': os.environ.get('WEATHER_API')}
     if env == 'docker':
         secret_path = f'/run/secrets/{secret_name}'
     elif env == 'dev':
         secret_path = PROJECT_PATH / 'src' / 'settings' / f'{secret_name}.yml'
+
     else:
         raise ValueError(
             'ENV variable may either be "dev" or "docker" in .env')
