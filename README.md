@@ -23,7 +23,7 @@ If you are developing :
 make requirements-dev
 ```
 
-To run the dash app =
+To run the dash app : 
 
 ```bash
 dash run src/application/dashapp.py
