@@ -37,6 +37,6 @@ def test_get_api_keys_fail_env():
 
 def test_get_api_keys():
     from src.settings import get_api_keys
-    keys = get_api_keys('api_keys', 'dev')
+    keys = get_api_keys('api_keys', os.environ.get('ENV'))
     assert keys is not None
     assert set(keys) == set(['DECAUX_API', 'WEATHER_API'])
