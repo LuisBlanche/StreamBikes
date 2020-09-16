@@ -9,7 +9,6 @@ import dash_table
 from src.settings import conf
 from src.application.data_for_dash import get_data, get_df_from_redis, get_prediction_error, filter_df
 
-GRAPH_INTERVAL = os.environ.get("GRAPH_INTERVAL", 6000)
 
 app = dash.Dash(
     __name__,
@@ -35,7 +34,7 @@ app.layout = html.Div([html.H2("Bike Stream"),
 
                        dcc.Interval(
     id="update",
-    interval=60000,
+    interval=conf.interval,
     n_intervals=0,
 ), ])
 

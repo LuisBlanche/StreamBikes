@@ -46,16 +46,16 @@ def get_df_from_redis(keys):
 
 
 def filter_df(df, timespan=24):
-    df = df[df['date'] - datetime.datetime.now() <
+    df = df[datetime.datetime.now() - df['date'] <
             datetime.timedelta(hours=timespan)]
     return df
 
 
 def get_prediction_error(data):
-    if len(data) > 60:
+    if len(data) > 3600 / (conf.interval / 1000):
         data = data.set_index('date')
-        data['available_bikes_1h'] = data['available_bikes_1h'].shift(60)
-        data_last_hour = data.iloc[-60:]
+        data['available_bikes_1h'] = data['available_bikes_1h'].shift(30)
+        data_last_hour = filter_df(data, 1)
         mae = mean_absolute_error(
             data_last_hour['available_bikes'], data_last_hour['available_bikes_1h'])
     else:
