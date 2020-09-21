@@ -1,5 +1,6 @@
-import math
 import datetime
+import math
+
 from src.data.collect_data import get_bike_weather_data
 
 

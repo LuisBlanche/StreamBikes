@@ -1,12 +1,14 @@
-import logging
-import redis
 import datetime
+import logging
+
 import pandas as pd
+import redis
 from sklearn.metrics import mean_absolute_error
+
 from src import settings
-from src.settings import conf
-from src.models.online_model import train_pred_step, define_pipeline
 from src.features.build_features import build_train_predict_features
+from src.models.online_model import define_pipeline, train_pred_step
+from src.settings import conf
 
 
 def get_data(contract, station, list_cat_features, list_num_features, target, learning_rate=0.1):

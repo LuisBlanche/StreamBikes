@@ -1,6 +1,6 @@
-from os import environb
-import pytest
 import os
+
+import pytest
 
 
 def test_get_redis_dev():

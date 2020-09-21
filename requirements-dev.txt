@@ -4,4 +4,6 @@ autopep8
 
 Sphinx
 coverage
-pytests
+pytest
+isort
+mypy
