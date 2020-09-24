@@ -1,9 +1,23 @@
 streambikes
 ==============================
 
-Testing real time bike APIs and online learning with Plotly Dash 
+Testing real time weather and bike APIs and online learning with Plotly Dash 
+You need api keys from [JCDecaux](https://developer.jcdecaux.com/#/opendata/vls?page=getstarted) and [OpenWeatherAPI](https://openweathermap.org/api/hourly-forecast) to run the project.
+To run in docker:
+- launch docker 
+- Add your API keys in `src/settings/api_keys.yml`
+- run :
+  ```bash
+  docker secret create api_keys src/settings/api_keys.yml
+  ```
+  ```bash
+  docker-compose build
+  ```
+  ```bash
+  docker-compose up
+  ```
 
-To run project:
+Run for dev:
 
 ```bash
 make create_environments
@@ -23,7 +37,13 @@ If you are developing :
 make requirements-dev
 ```
 
-To run the dash app : 
+To run the dash app: 
+export API keys as environment variables :
+
+```bash
+export DECAUX_API="yourbikeapikey"
+export WEATHER_API="yourweatherapikey"
+```
 
 ```bash
 dash run src/application/dashapp.py
@@ -31,50 +51,47 @@ dash run src/application/dashapp.py
 
 Project Organization
 ------------
-
-    ├── LICENSE
-    ├── Makefile           <- Makefile with commands like `make data` or `make train`
-    ├── README.md          <- The top-level README for developers using this project.
-    ├── data
-    │   ├── external       <- Data from third party sources.
-    │   ├── interim        <- Intermediate data that has been transformed.
-    │   ├── processed      <- The final, canonical data sets for modeling.
-    │   └── raw            <- The original, immutable data dump.
-    │
-    ├── docs               <- A default Sphinx project; see sphinx-doc.org for details
-    │
-    ├── models             <- Trained and serialized models, model predictions, or model summaries
-    │
-    ├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
-    │                         the creator's initials, and a short `-` delimited description, e.g.
-    │                         `1.0-jqp-initial-data-exploration`.
-    │
-    ├── references         <- Data dictionaries, manuals, and all other explanatory materials.
-    │
-    ├── reports            <- Generated analysis as HTML, PDF, LaTeX, etc.
-    │   └── figures        <- Generated graphics and figures to be used in reporting
-    │
-    ├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
-    │                         generated with `pip freeze > requirements.txt`
-    │
-    ├── setup.py           <- makes project pip installable (pip install -e .) so src can be imported
-    ├── src                <- Source code for use in this project.
-    │   ├── __init__.py    <- Makes src a Python module
-    │   │
-    │   ├── data           <- Scripts to download or generate data
-    │   │   └── collect_bike_data.py
-    │   │
-    │   ├── features       <- Scripts to turn raw data into features for modeling
-    │   │   └── build_features.py
-    │   │
-    │   ├── models         <- Scripts for online learning (train and predict at the same time) 
-    │   │   └── online_model.py
-    │   │
-    │   └── application  <- Scripts to create a small dashapp tp present results
-    │       └── dashapp.py
-    │
-    └── tox.ini            <- tox file with settings for running tox; see tox.readthedocs.io
-
+```
+├── docker-compose.yml          <- Dash + Redis services docker compose 
+├── Dockerfile                  <- Dash application docker file
+├── Makefile                    <- Makefile with commands like `make data` or `make train`
+├── LICENSE
+├── README.md               
+├── data                        <- data (essentially empty because we use online learning)
+├── docs                        <- project documentation
+├── requirements-dev.txt        <- python developpement modules requirements (tests, linting, etc)
+├── requirements.txt            <- python packages requirements
+├── mypy.ini                    <- mypy static type checking settings
+├── setup.py                    <- makes project pip installable (pip install -e .) so src can be imported
+├── src                         <- Source code for use in this project.
+│   ├── __init__.py
+│   ├── application             <- Scripts to create a Plotly Dash app to present results
+│   │   ├── dashapp.py
+│   │   └── data_for_dash.py
+│   ├── data                    <- Scripts to download or generate data (calls APIs)
+│   │   ├── __init__.py
+│   │   └── collect_data.py
+│   ├── features                <- Scripts to turn raw data into features for modeling
+│   │   ├── __init__.py
+│   │   └── build_features.py
+│   ├── models                  <- Scripts for online learning (train and predict at the same time)
+│   │   ├── __init__.py
+│   │   └── online_model.py
+│   └── settings                <- settings folder that manages changes between dev/staging(CI)/ and prod settings
+│       ├── __init__.py
+│       ├── api_keys.template
+│       └── conf.py
+├── tests
+│   ├── __init__.py
+│   ├── conftest.py
+│   └── unit_tests
+│       ├── application
+│       ├── data
+│       ├── features
+│       ├── models
+│       └── settings
+└── tox.ini                     <- tox file with settings for running tox; see tox.readthedocs.io
+```
 
 --------
 

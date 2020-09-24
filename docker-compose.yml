@@ -10,6 +10,7 @@ services:
       - "8050:8050"
     environment:
       API_SECRETS_FILE: /run/secrets/api_keys
+      ENV: docker
     depends_on:
       - redis_service
     restart: always
