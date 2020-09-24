@@ -1,8 +1,11 @@
-import logging
-import time
 import datetime
+import logging
 import numbers
-from creme import compose, linear_model, metrics, preprocessing, optim, time_series, feature_extraction, stats
+import time
+
+from creme import (compose, feature_extraction, linear_model, metrics, optim,
+                   preprocessing, stats, time_series)
+
 from src.features.build_features import build_train_predict_features
 
 

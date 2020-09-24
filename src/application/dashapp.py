@@ -1,14 +1,16 @@
-import dash
-import os
 import datetime
+import os
+
+import dash
 import dash_core_components as dcc
 import dash_html_components as html
-from dash.dependencies import Input, Output
 import dash_table
+from dash.dependencies import Input, Output
 
+from src.application.data_for_dash import (filter_df, get_data,
+                                           get_df_from_redis,
+                                           get_prediction_error)
 from src.settings import conf
-from src.application.data_for_dash import get_data, get_df_from_redis, get_prediction_error, filter_df
-
 
 app = dash.Dash(
     __name__,

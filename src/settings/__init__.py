@@ -1,7 +1,8 @@
-from pathlib import Path
 import logging
-import yaml
 import os
+from pathlib import Path
+
+import yaml
 
 log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 logging.basicConfig(level=logging.INFO, format=log_fmt)
