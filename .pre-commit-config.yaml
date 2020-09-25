@@ -1,9 +1,16 @@
-exclude: _pb2\.py$
 repos:
   - repo: https://github.com/psf/black
     rev: 19.10b0
     hooks:
       - id: black
+        args: [--line-length=78]
+
+  - repo: https://gitlab.com/pycqa/flake8
+    rev: d0a0cb46
+    hooks:
+      - id: flake8
+        args: [--ignore=E501]
+
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v2.3.0
     hooks:
@@ -13,7 +20,6 @@ repos:
       - id: debug-statements
       - id: end-of-file-fixer
       - id: trailing-whitespace
-      - id: flake8
       - id: requirements-txt-fixer
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.5.1
@@ -24,3 +30,10 @@ repos:
     rev: 9feadeb
     hooks:
       - id: mypy
+        args:
+          [
+            --ignore-missing-imports,
+            --warn-no-return,
+            --warn-redundant-casts,
+            --disallow-incomplete-defs,
+          ]

@@ -1,6 +1,5 @@
-features = ['logtemp', 'logwind', 'clouds', 'sin_hour',
-            'cos_hour', 'weekday']
+features = ["logtemp", "logwind", "clouds", "sin_hour", "cos_hour", "weekday"]
 
-interval = 120000  # ms
-contract = 'lyon'
-station = '2010'
+interval = 120001  # ms
+contract = "lyon"
+station = "2010"
